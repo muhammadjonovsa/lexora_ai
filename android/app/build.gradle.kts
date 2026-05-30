@@ -47,6 +47,7 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 }
@@ -55,9 +56,4 @@ flutter {
     source = "../.."
 }
 
-// Conditionally apply Google Services only if the config file exists
-if (file("google-services.json").exists()) {
-    apply(plugin = "com.google.gms.google-services")
-} else {
-    logger.warn("google-services.json not found. Google Services plugin is not applied. LexoraAI will run in Offline Guest Mode.")
-}
+

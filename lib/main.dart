@@ -1,48 +1,55 @@
-import 'package:firebase_core/firebase_core.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'core/routes/routes.dart';
 import 'core/theme/app_theme.dart';
 import 'core/constants/app_constants.dart';
 import 'features/profile/presentation/profile_settings_page.dart';
+import 'services/local_storage_service.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  // Enforce premium portrait orientation for beautiful consistent visual layouts
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+  // Global crash protection shield
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    
+    // Enforce premium portrait orientation for beautiful consistent visual layouts
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
 
-  // Attempt Firebase Initialization gracefully (Zero blocker developer experience!)
-  try {
-    await Firebase.initializeApp();
-    print("Firebase successfully initialized inside LexoraAI.");
-  } catch (e) {
-    print("Firebase Core not configured or missing configuration files: $e. "
-        "LexoraAI will start in secure Offline Guest Mode fallback.");
-  }
+    // Safe initialization of local database (Hive)
+    await LocalStorageService.init();
 
-  // Load user selected Theme Mode from cache
-  final prefs = await SharedPreferences.getInstance();
-  final isDarkModeCached = prefs.getBool(AppConstants.keyDarkMode);
-  
-  ThemeMode initialThemeMode = ThemeMode.system;
-  if (isDarkModeCached != null) {
-    initialThemeMode = isDarkModeCached ? ThemeMode.dark : ThemeMode.light;
-  }
+    // Load user selected Theme Mode from Hive local cache
+    final isDarkModeCached = LocalStorageService.getSetting(AppConstants.keyDarkMode) as bool?;
+    
+    ThemeMode initialThemeMode = ThemeMode.system;
+    if (isDarkModeCached != null) {
+      initialThemeMode = isDarkModeCached ? ThemeMode.dark : ThemeMode.light;
+    }
 
-  runApp(
-    ProviderScope(
-      overrides: [
-        // Initialize or override states here if necessary
-      ],
-      child: LexoraApp(initialThemeMode: initialThemeMode),
-    ),
-  );
+    // Set custom Flutter error hook to capture unhandled layout or rendering errors gracefully
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.presentError(details);
+      print("Captured Flutter error: ${details.exception}");
+    };
+
+    runApp(
+      ProviderScope(
+        overrides: [
+          // Initialize or override states here if necessary
+        ],
+        child: LexoraApp(initialThemeMode: initialThemeMode),
+      ),
+    );
+  }, (Object error, StackTrace stack) {
+    print("CRITICAL: Captured unhandled async/zoned exception: $error");
+    print(stack);
+    
+    // In production, you could show a custom minimal fallback recovery UI here if the error happens during bootstrap.
+  });
 }
 
 class LexoraApp extends ConsumerWidget {

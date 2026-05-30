@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/routes/routes.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/custom_widgets.dart';
-import '../../../services/firebase_auth_service.dart';
+import '../../../services/local_auth_service.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -130,12 +130,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       controller: _emailController,
                       label: "Email",
                       prefixIcon: Icons.email_outlined,
-                      keyboardType: TextInputType.emailAddress,
+                      keyboardType: TextInputType.text,
                       validator: (val) {
-                        if (val == null || val.trim().isEmpty) return "Email kiritish majburiy";
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val.trim())) {
-                          return "Email formati noto'g'ri";
-                        }
+                        if (val == null || val.trim().isEmpty) return "Foydalanuvchi nomi kiritish majburiy";
+                        if (val.trim().length < 3) return "Foydalanuvchi nomi kamida 3 ta belgi bo'lishi kerak";
                         return null;
                       },
                     ),
@@ -326,12 +324,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       controller: _emailController,
                       label: "Email",
                       prefixIcon: Icons.email_outlined,
-                      keyboardType: TextInputType.emailAddress,
+                      keyboardType: TextInputType.text,
                       validator: (val) {
-                        if (val == null || val.trim().isEmpty) return "Email kiritish majburiy";
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val.trim())) {
-                          return "Email formati noto'g'ri";
-                        }
+                        if (val == null || val.trim().isEmpty) return "Foydalanuvchi nomi kiritish majburiy";
+                        if (val.trim().length < 3) return "Foydalanuvchi nomi kamida 3 ta belgi bo'lishi kerak";
                         return null;
                       },
                     ),
@@ -482,12 +478,10 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                       controller: _emailController,
                       label: "Email",
                       prefixIcon: Icons.email_outlined,
-                      keyboardType: TextInputType.emailAddress,
+                      keyboardType: TextInputType.text,
                       validator: (val) {
-                        if (val == null || val.trim().isEmpty) return "Email kiritish majburiy";
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val.trim())) {
-                          return "Email formati noto'g'ri";
-                        }
+                        if (val == null || val.trim().isEmpty) return "Foydalanuvchi nomi kiritish majburiy";
+                        if (val.trim().length < 3) return "Foydalanuvchi nomi kamida 3 ta belgi bo'lishi kerak";
                         return null;
                       },
                     ),

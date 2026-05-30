@@ -5,7 +5,8 @@ import '../../../core/routes/routes.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/widgets/custom_widgets.dart';
-import '../../../services/firebase_auth_service.dart';
+import '../../../services/local_auth_service.dart';
+import '../../../services/local_storage_service.dart';
 
 // Riverpod theme state manager provider
 final themeModeProvider = StateProvider<ThemeMode>((ref) {
@@ -36,10 +37,9 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
     super.dispose();
   }
 
-  // Load key from SharedPreferences
+  // Load key from LocalStorageService (Hive Box)
   Future<void> _loadApiKey() async {
-    final prefs = await SharedPreferences.getInstance();
-    final key = prefs.getString(AppConstants.keyApiKey) ?? '';
+    final key = LocalStorageService.getSetting(AppConstants.keyApiKey, defaultValue: '') as String;
     setState(() {
       _apiKeyController.text = key;
     });
@@ -50,8 +50,7 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
     setState(() => _isSavingKey = true);
     final key = _apiKeyController.text.trim();
     
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(AppConstants.keyApiKey, key);
+    await LocalStorageService.saveSetting(AppConstants.keyApiKey, key);
     
     setState(() => _isSavingKey = false);
     
@@ -71,8 +70,7 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
     final mode = isDark ? ThemeMode.dark : ThemeMode.light;
     ref.read(themeModeProvider.notifier).state = mode;
     
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(AppConstants.keyDarkMode, isDark);
+    await LocalStorageService.saveSetting(AppConstants.keyDarkMode, isDark);
   }
 
   // Handle Log Out

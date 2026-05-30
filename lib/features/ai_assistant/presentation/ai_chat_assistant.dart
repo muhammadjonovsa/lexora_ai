@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/custom_widgets.dart';
 import '../../../services/ai_service.dart';
+import '../../../services/local_storage_service.dart';
+import '../../../services/local_auth_service.dart';
 
 class AIChatAssistantPage extends ConsumerStatefulWidget {
   const AIChatAssistantPage({Key? key}) : super(key: key);
@@ -17,6 +19,33 @@ class _AIChatAssistantPageState extends ConsumerState<AIChatAssistantPage> {
   final ScrollController _scrollController = ScrollController();
   bool _isGenerating = false;
   String _streamingText = '';
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadHistory();
+    });
+  }
+
+  String _getUserId() {
+    final user = ref.read(authServiceProvider).currentUser;
+    if (user != null) return user.uid;
+    final isGuest = ref.read(guestModeProvider);
+    if (isGuest) return 'guest_user';
+    return 'anonymous';
+  }
+
+  void _loadHistory() {
+    final userId = _getUserId();
+    final history = LocalStorageService.getAIChatHistory(userId);
+    if (history.isNotEmpty && mounted) {
+      setState(() {
+        _messages.addAll(history);
+      });
+      _scrollToBottom();
+    }
+  }
 
   // Quick Starter Prompts
   final List<String> _starterPrompts = [
@@ -45,6 +74,11 @@ class _AIChatAssistantPageState extends ConsumerState<AIChatAssistantPage> {
     });
   }
 
+  void _saveChatHistory() {
+    final userId = _getUserId();
+    LocalStorageService.saveAIChatHistory(userId, _messages);
+  }
+
   // Handle message send
   Future<void> _sendMessage(String text) async {
     final trimmedText = text.trim();
@@ -57,6 +91,7 @@ class _AIChatAssistantPageState extends ConsumerState<AIChatAssistantPage> {
       _streamingText = '';
     });
     _scrollToBottom();
+    _saveChatHistory();
 
     final aiService = ref.read(aiServiceProvider);
 
@@ -81,6 +116,7 @@ class _AIChatAssistantPageState extends ConsumerState<AIChatAssistantPage> {
           });
           _isGenerating = false;
         });
+        _saveChatHistory();
       }
     }
   }
@@ -110,6 +146,7 @@ class _AIChatAssistantPageState extends ConsumerState<AIChatAssistantPage> {
         _isGenerating = false;
       });
       _scrollToBottom();
+      _saveChatHistory();
     }
   }
 

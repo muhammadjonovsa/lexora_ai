@@ -7,7 +7,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/custom_widgets.dart';
 import '../../editor/data/document_model.dart';
 import '../../editor/data/document_repository.dart';
-import '../../../services/firebase_auth_service.dart';
+import '../../../services/local_auth_service.dart';
 import '../../../services/export_service.dart';
 
 class DashboardPage extends ConsumerStatefulWidget {

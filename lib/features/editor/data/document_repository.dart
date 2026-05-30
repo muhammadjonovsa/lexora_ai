@@ -1,10 +1,7 @@
-import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'document_model.dart';
-import '../../../services/firebase_auth_service.dart';
-import '../../../core/constants/app_constants.dart';
+import '../../../services/local_auth_service.dart';
+import '../../../services/local_storage_service.dart';
 
 final documentRepositoryProvider = Provider<DocumentRepository>((ref) {
   return DocumentRepository(ref);
@@ -17,17 +14,10 @@ final documentListProvider = StateNotifierProvider<DocumentListNotifier, List<Do
 
 class DocumentRepository {
   final Ref _ref;
-  FirebaseFirestore? _firestore;
 
-  DocumentRepository(this._ref) {
-    try {
-      _firestore = FirebaseFirestore.instance;
-    } catch (_) {
-      _firestore = null;
-    }
-  }
+  DocumentRepository(this._ref);
 
-  bool get isFirestoreAvailable => _firestore != null;
+  bool get isFirestoreAvailable => false; // Fully offline-only application
 
   String _getUserId() {
     final user = _ref.read(authServiceProvider).currentUser;
@@ -39,143 +29,49 @@ class DocumentRepository {
     return 'anonymous';
   }
 
-  // Load documents from either local storage or cloud
+  // Load documents from Hive storage
   Future<List<DocumentModel>> loadDocuments() async {
-    final userId = _getUserId();
-    
-    // Always start by reading local cache first (Offline first!)
-    final localDocs = await _loadFromLocal();
-    final userDocs = localDocs.where((doc) => doc.userId == userId).toList();
-
-    if (!isFirestoreAvailable || userId == 'guest_user' || userId == 'anonymous') {
+    try {
+      final userId = _getUserId();
+      final allDocsList = LocalStorageService.getAllDocuments();
+      
+      final List<DocumentModel> userDocs = allDocsList
+          .map((item) => DocumentModel.fromMap(item))
+          .where((doc) => doc.userId == userId)
+          .toList();
+          
+      // Sort by last modified date (newest first)
+      userDocs.sort((a, b) => b.lastModified.compareTo(a.lastModified));
       return userDocs;
-    }
-
-    try {
-      // Fetch from Firestore
-      final snapshot = await _firestore!
-          .collection('users')
-          .doc(userId)
-          .collection('documents')
-          .orderBy('lastModified', descending: true)
-          .get();
-
-      final remoteDocs = snapshot.docs.map((doc) {
-        final data = doc.data();
-        data['id'] = doc.id; // ensure ID matches doc ID
-        return DocumentModel.fromMap(data).copyWith(isSynced: true);
-      }).toList();
-
-      // Merge remote and local (remote takes precedence, write missing back to local)
-      if (remoteDocs.isNotEmpty) {
-        await _saveMultipleToLocal(remoteDocs);
-        return remoteDocs;
-      }
     } catch (e) {
-      print("Firestore load failed, returning local cache: $e");
-    }
-
-    return userDocs;
-  }
-
-  // Save single document (Auto-save)
-  Future<void> saveDocument(DocumentModel doc) async {
-    final userId = _getUserId();
-    final updatedDoc = doc.copyWith(userId: userId, lastModified: DateTime.now());
-
-    // 1. Save to local storage first (instant responsiveness)
-    await _saveToLocal(updatedDoc);
-
-    // 2. Sync to cloud asynchronously if online
-    if (isFirestoreAvailable && userId != 'guest_user' && userId != 'anonymous') {
-      try {
-        await _firestore!
-            .collection('users')
-            .doc(userId)
-            .collection('documents')
-            .doc(updatedDoc.id)
-            .set(updatedDoc.toMap());
-        
-        // Update local state flag to synced
-        await _saveToLocal(updatedDoc.copyWith(isSynced: true));
-      } catch (e) {
-        print("Firestore auto-save sync failed: $e. Saved locally.");
-      }
-    }
-  }
-
-  // Delete Document
-  Future<void> deleteDocument(String docId) async {
-    final userId = _getUserId();
-
-    // 1. Remove from local cache
-    final localDocs = await _loadFromLocal();
-    localDocs.removeWhere((doc) => doc.id == docId);
-    await _saveAllToLocal(localDocs);
-
-    // 2. Remove from Firestore
-    if (isFirestoreAvailable && userId != 'guest_user' && userId != 'anonymous') {
-      try {
-        await _firestore!
-            .collection('users')
-            .doc(userId)
-            .collection('documents')
-            .doc(docId)
-            .delete();
-      } catch (e) {
-        print("Firestore delete failed: $e");
-      }
-    }
-  }
-
-  // Local helper: Load all docs from SharedPreferences
-  Future<List<DocumentModel>> _loadFromLocal() async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonString = prefs.getString(AppConstants.keyRecentDocs);
-    if (jsonString == null) return [];
-
-    try {
-      final List<dynamic> decodedList = json.decode(jsonString);
-      return decodedList.map((item) => DocumentModel.fromMap(item)).toList();
-    } catch (e) {
-      print("Error decoding local documents cache: $e");
+      print("Error loading documents: $e");
       return [];
     }
   }
 
-  // Local helper: Save a single doc to cache
-  Future<void> _saveToLocal(DocumentModel newDoc) async {
-    final list = await _loadFromLocal();
-    final idx = list.indexWhere((doc) => doc.id == newDoc.id);
-    if (idx != -1) {
-      list[idx] = newDoc;
-    } else {
-      list.insert(0, newDoc);
+  // Save single document locally
+  Future<void> saveDocument(DocumentModel doc) async {
+    try {
+      final userId = _getUserId();
+      final updatedDoc = doc.copyWith(
+        userId: userId, 
+        lastModified: DateTime.now(),
+        isSynced: false, // Local-only documents
+      );
+
+      await LocalStorageService.saveDocument(updatedDoc.id, updatedDoc.toMap());
+    } catch (e) {
+      print("Error saving document: $e");
     }
-    await _saveAllToLocal(list);
   }
 
-  // Local helper: Save multiple docs
-  Future<void> _saveMultipleToLocal(List<DocumentModel> docs) async {
-    final list = await _loadFromLocal();
-    for (var doc in docs) {
-      final idx = list.indexWhere((d) => d.id == doc.id);
-      if (idx != -1) {
-        list[idx] = doc;
-      } else {
-        list.add(doc);
-      }
+  // Delete Document locally
+  Future<void> deleteDocument(String docId) async {
+    try {
+      await LocalStorageService.deleteDocument(docId);
+    } catch (e) {
+      print("Error deleting document: $e");
     }
-    await _saveAllToLocal(list);
-  }
-
-  // Local helper: Overwrite entire list
-  Future<void> _saveAllToLocal(List<DocumentModel> list) async {
-    final prefs = await SharedPreferences.getInstance();
-    // Sort before saving locally to keep consistent ordering
-    list.sort((a, b) => b.lastModified.compareTo(a.lastModified));
-    final encoded = json.encode(list.map((doc) => doc.toMap()).toList());
-    await prefs.setString(AppConstants.keyRecentDocs, encoded);
   }
 }
 
@@ -197,11 +93,11 @@ class DocumentListNotifier extends StateNotifier<List<DocumentModel>> {
     final idx = state.indexWhere((d) => d.id == doc.id);
     if (idx != -1) {
       final updatedList = List<DocumentModel>.from(state);
-      updatedList[idx] = doc.copyWith(lastModified: DateTime.now());
+      updatedList[idx] = doc.copyWith(lastModified: DateTime.now(), isSynced: false);
       updatedList.sort((a, b) => b.lastModified.compareTo(a.lastModified));
       state = updatedList;
     } else {
-      state = [doc.copyWith(lastModified: DateTime.now()), ...state];
+      state = [doc.copyWith(lastModified: DateTime.now(), isSynced: false), ...state];
     }
   }
 
