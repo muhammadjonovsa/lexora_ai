@@ -175,7 +175,7 @@ class _AIChatAssistantPageState extends ConsumerState<AIChatAssistantPage> {
             ),
             const SizedBox(width: 8),
             const Text(
-              "Lexora AI Chat",
+              "Matn Muharriri AI Chat",
               style: TextStyle(fontWeight: FontWeight.bold),
             )
           ],
@@ -219,7 +219,7 @@ class _AIChatAssistantPageState extends ConsumerState<AIChatAssistantPage> {
               const Center(
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 8),
-                  child: Text("Lexora fikrlamoqda...", style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey)),
+                  child: Text("Matn Muharriri fikrlamoqda...", style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey)),
                 ),
               ),
             ],
@@ -253,7 +253,7 @@ class _AIChatAssistantPageState extends ConsumerState<AIChatAssistantPage> {
                         textInputAction: TextInputAction.send,
                         onSubmitted: (val) => _sendMessage(val),
                         decoration: const InputDecoration(
-                          hintText: "Lexora dan so'rang...",
+                          hintText: "Matn Muharriri dan so'rang...",
                           filled: false,
                           enabledBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,

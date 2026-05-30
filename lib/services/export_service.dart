@@ -52,7 +52,7 @@ class ExportService {
                     ),
                   ),
                   pw.Text(
-                    "LexoraAI Hujjati",
+                    "Matn Muharriri Hujjati",
                     style: const pw.TextStyle(
                       fontSize: 10,
                       color: PdfColors.grey600,
@@ -111,7 +111,7 @@ class ExportService {
       final XFile xFile = XFile(file.path);
       await Share.shareXFiles(
         [xFile],
-        text: "'$documentTitle' - LexoraAI da yaratilgan premium hujjat.",
+        text: "'$documentTitle' - Matn Muharriri da yaratilgan premium hujjat.",
       );
     } catch (e) {
       print("Sharing failed: $e");

@@ -150,7 +150,7 @@ class _ProfileSettingsPageState extends ConsumerState<ProfileSettingsPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "LexoraAI to'liq va cheksiz AI imkoniyatlaridan foydalanish uchun o'zingizning shaxsiy Gemini API kalitingizni kiriting.",
+                      "Matn Muharriri to'liq va cheksiz AI imkoniyatlaridan foydalanish uchun o'zingizning shaxsiy Gemini API kalitingizni kiriting.",
                       style: theme.textTheme.bodyMedium,
                     ),
                     const SizedBox(height: 16),
