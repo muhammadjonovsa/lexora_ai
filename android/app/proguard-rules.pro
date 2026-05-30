@@ -1,4 +1,4 @@
-# Flutter Proguard Rules for LexoraAI
+# Flutter Proguard Rules for Matn Muharriri
 
 # Ignore missing optional script packages from Google ML Kit Text Recognition
 # We only utilize the Latin OCR script engine, so these warnings are safely ignored.

@@ -1,11 +1,11 @@
 class AppConstants {
-  static const String appName = 'LexoraAI';
+  static const String appName = 'Matn Muharriri';
   
   // Storage Keys
-  static const String keyApiKey = 'lexora_gemini_api_key';
-  static const String keyDarkMode = 'lexora_dark_mode';
-  static const String keyGuestMode = 'lexora_guest_mode';
-  static const String keyRecentDocs = 'lexora_recent_documents_cache';
+  static const String keyApiKey = 'matn_muharriri_gemini_api_key';
+  static const String keyDarkMode = 'matn_muharriri_dark_mode';
+  static const String keyGuestMode = 'matn_muharriri_guest_mode';
+  static const String keyRecentDocs = 'matn_muharriri_recent_documents_cache';
   
   // Default Settings
   static const String defaultGeminiModel = 'gemini-1.5-flash';
@@ -44,7 +44,7 @@ class AppConstants {
       "Preserve formatting and tone. Output ONLY the direct translated text.";
       
   static const String promptGeneralAI =
-      "You are Lexora, an elegant, helpful, and highly intelligent AI mobile writing assistant. "
+      "You are Matn Muharriri, an elegant, helpful, and highly intelligent AI mobile writing assistant. "
       "You assist the user in writing articles, structuring arguments, formatting documents, and brainstorms. "
       "Ensure your responses are clear, premium, direct, and well-structured. "
       "Use markdown styling. Keep your responses highly relevant and concise for a mobile view.";

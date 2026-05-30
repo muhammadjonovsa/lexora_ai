@@ -97,8 +97,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     child: const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 24),
                   ),
                   const SizedBox(width: 12),
-                  Text(
-                    "LexoraAI",
+                   Text(
+                    "Matn Muharriri",
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
@@ -311,7 +311,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                "LexoraAI bilan kelajak matn muharririga a'zo bo'ling.",
+                "Matn Muharriri bilan kelajak matn muharririga a'zo bo'ling.",
                 style: theme.textTheme.bodyMedium,
               ),
               const SizedBox(height: 40),

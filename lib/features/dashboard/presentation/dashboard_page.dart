@@ -139,7 +139,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> with SingleTicker
             ),
             const SizedBox(width: 10),
             Text(
-              "LexoraAI",
+              "Matn Muharriri",
               style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
           ],

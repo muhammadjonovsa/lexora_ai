@@ -455,7 +455,7 @@ class _EditorPageState extends ConsumerState<EditorPage> {
       builder: (context) => const AlertDialog(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        content: LexoraLoader(statusText: "LexoraAI matnni qayta ishlamoqda..."),
+        content: LexoraLoader(statusText: "Matn Muharriri matnni qayta ishlamoqda..."),
       ),
     );
 

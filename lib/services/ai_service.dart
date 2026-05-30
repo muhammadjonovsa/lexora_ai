@@ -157,13 +157,13 @@ class AIService {
           "${prompt.replaceAll("intelekt", "intellekt").replaceAll("xato", "xatolik")}\n"
           "```\n\n"
           "Explanation:\n"
-          "LexoraAI Sandbox sizga yordam bermoqda! Matndagi imlo xatolari avtomatik tarzda aniqlandi. "
+          "Matn Muharriri Sandbox sizga yordam bermoqda! Matndagi imlo xatolari avtomatik tarzda aniqlandi. "
           "Haqiqiy Gemini API kalitini **Sozlamalar** sahifasida kiritishingiz mumkin.";
     }
 
     if (systemPrompt.contains(AppConstants.promptSummarize)) {
       return "### Qisqacha Xulosa (Summary)\n"
-          "Taqdim etilgan matn LexoraAI smart muharririda muvaffaqiyatli tahlil qilindi.\n\n"
+          "Taqdim etilgan matn Matn Muharriri aqlli muharririda muvaffaqiyatli tahlil qilindi.\n\n"
           "### Asosiy Mavzular:\n"
           "- Matn mazmunining qisqa va lo'nda bayoni.\n"
           "- Foydalanuvchi hujjatlarining intellektual qayta ishlanishi.\n"
@@ -174,11 +174,11 @@ class AIService {
 
     if (systemPrompt.contains(AppConstants.promptPolish)) {
       return "Hurmatli foydalanuvchi,\n\n"
-          "Ushbu hujjat orqali shuni ma'lum qilamizki, LexoraAI dasturiy ta'minoti rasmiy "
+          "Ushbu hujjat orqali shuni ma'lum qilamizki, Matn Muharriri dasturiy ta'minoti rasmiy "
           "va professional darajada ma'lumotlarni rasmiylashtirish imkoniyatini taqdim etadi. "
           "Taqdim etilgan matn rasmiy-idoraviy uslub talablariga muvofiq ravishda mukammallashtirildi.\n\n"
           "Hurmat bilan,\n"
-          "LexoraAI Professional Redaktori.";
+          "Matn Muharriri Professional Redaktori.";
     }
 
     if (systemPrompt.contains(AppConstants.promptTranslate)) {
@@ -195,10 +195,10 @@ class AIService {
     // General AI chat fallback responses
     final text = prompt.toLowerCase();
     if (text.contains('salom') || text.contains('hello')) {
-      return "Salom! Men LexoraAI aqlli yordamchisiman. Sizga hujjatlar yozish, grammar xatolarni tuzatish, translation qilish yoki matnlarni professional uslubga keltirishda qanday yordam bera olaman?\n\n*Haqiqiy rejimda ishlash uchun API kalitni o'rnating!*";
+      return "Salom! Men Matn Muharriri aqlli yordamchisiman. Sizga hujjatlar yozish, grammar xatolarni tuzatish, translation qilish yoki matnlarni professional uslubga keltirishda qanday yordam bera olaman?\n\n*Haqiqiy rejimda ishlash uchun API kalitni o'rnating!*";
     }
     
-    return "Men LexoraAI aqlli yordamchisi Sandbox rejimidaman.\n\n"
+    return "Men Matn Muharriri aqlli yordamchisi Sandbox rejimidaman.\n\n"
         "Siz kiritgan matn:\n"
         "\"$prompt\"\n\n"
         "Men hozir oflayn sandbox rejimida ishlayapman. Haqiqiy sun'iy intellekt javoblarini olish uchun **Sozlamalar** sahifasiga o'tib, **Gemini API kalitini** faollashtiring. Bu juda oson va mutlaqo xavfsiz!";
